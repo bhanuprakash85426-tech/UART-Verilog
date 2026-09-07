@@ -1,0 +1,56 @@
+`timescale 1ns/1ps
+
+module transmitter_tb;
+
+    reg clk;
+    reg wr_en;
+    reg rst;
+    reg [7:0] data_in;
+
+    wire tx;
+    wire busy;
+
+    transmitter uut (
+        .clk(clk),
+        .wr_en(wr_en),
+        .rst(rst),
+        .data_in(data_in),
+        .tx(tx),
+        .busy(busy)
+    );
+
+    // Clock: 10 ns period
+    always #5 clk = ~clk;
+
+    initial begin
+
+        clk    = 0;
+        wr_en  = 0;
+        rst    = 1;
+        data_in = 8'b0;
+
+        // Reset
+        #20;
+        rst = 0;
+
+        // Send A5
+        #10;
+        data_in = 8'hA5;
+        wr_en   = 1;
+
+        #10;
+        wr_en = 0;
+
+        // Wait for transmission
+        #100;
+
+        $display("TX TEST");
+        $display("Data Sent = %h", data_in);
+        $display("TX = %b", tx);
+
+        #20;
+        $finish;
+
+    end
+
+endmodule
